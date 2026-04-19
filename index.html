@@ -406,6 +406,52 @@ function Home({questions,dueToday,streak,domStats,nav}){
         </button>
       )}
 
+      {/* Study Plan */}
+      {(()=>{
+        const plan=DOMAINS.map(d=>{
+          const qs=questions.filter(q=>q.domain===d);
+          const unseen=qs.filter(q=>!q.history||q.history.length===0).length;
+          const total=qs.reduce((s,q)=>(q.history||[]).length+s,0);
+          const correct=qs.reduce((s,q)=>(q.history||[]).filter(h=>h.g>=2).length+s,0);
+          const pct=total?Math.round(correct/total*100):0;
+          return{d,count:qs.length,unseen,pct,total};
+        }).filter(d=>d.count>0).sort((a,b)=>{
+          if(a.unseen!==b.unseen)return b.unseen-a.unseen;
+          return a.pct-b.pct;
+        });
+        if(!plan.length)return null;
+        const next=plan[0];
+        return(
+          <div className="card p-5">
+            <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>Study Plan</p>
+            <button onClick={()=>nav('study','focused:'+next.d)} className="w-full flex items-center gap-4 text-left transition-all active:scale-[0.98]">
+              <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{background:DOM_CLR[next.d]+'20'}}>
+                <span className="text-xl">🎯</span>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Next up: {next.d}</p>
+                <p className="text-xs" style={{color:'#86868b'}}>
+                  {next.unseen>0?`${next.unseen} unseen of ${next.count}`:
+                   `${next.pct}% accuracy — needs reinforcement`}
+                </p>
+              </div>
+              <Icon name="arrow" size={16} color="#0071e3"/>
+            </button>
+            <div className="mt-3 flex flex-wrap gap-1">
+              {plan.map(p=>(
+                <button key={p.d} onClick={()=>nav('study','focused:'+p.d)}
+                  className="text-xs px-2.5 py-1.5 rounded-lg transition-all active:scale-95"
+                  style={{background:p.unseen>0?DOM_CLR[p.d]+'15':'#f5f5f7',
+                          color:p.unseen>0?DOM_CLR[p.d]:'#86868b',
+                          fontWeight:p.unseen>0?600:400}}>
+                  {p.d.replace(' IR','')} {p.unseen>0?`(${p.unseen})`:p.total?`${p.pct}%`:''}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Domain Breakdown */}
       <div className="card p-5">
         <p className="text-xs font-semibold uppercase tracking-wider mb-4" style={{color:'#86868b',letterSpacing:'0.05em'}}>Performance by Domain</p>
@@ -467,31 +513,106 @@ function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vi
   if(subPage==='exam')return<ExamSession questions={questions} rateQ={rateQ} nav={nav}/>;
   if(subPage==='flash')return<FlashSession flashcards={flashcards} setFlashcards={setFlashcards} nav={nav}/>;
   if(subPage==='viva')return<VivaSession vivaLog={vivaLog} setVivaLog={setVivaLog} nav={nav} tickStreak={tickStreak}/>;
+  if(subPage&&subPage.startsWith('focused:'))return<FocusedSession domain={subPage.slice(8)} questions={questions} rateQ={rateQ} nav={nav}/>;
+
+  // Calculate per-domain stats for the topic picker
+  const domainInfo=DOMAINS.map(d=>{
+    const qs=questions.filter(q=>q.domain===d);
+    const reviewed=qs.filter(q=>q.history&&q.history.length>0);
+    const correct=qs.reduce((s,q)=>(q.history||[]).filter(h=>h.g>=2).length+s,0);
+    const total=qs.reduce((s,q)=>(q.history||[]).length+s,0);
+    const pct=total?Math.round(correct/total*100):0;
+    const unseen=qs.length-reviewed.length;
+    return{d,count:qs.length,reviewed:reviewed.length,unseen,pct,total};
+  }).filter(d=>d.count>0);
+
+  // Sort weakest first for recommendation
+  const weakest=[...domainInfo].sort((a,b)=>{
+    if(a.unseen!==b.unseen)return b.unseen-a.unseen; // most unseen first
+    return a.pct-b.pct; // then lowest accuracy
+  });
 
   const modes=[
-    {id:'review',title:'Spaced Repetition',desc:`${dueToday.length} cards due`,icon:'🔄',clr:'#0071e3',active:dueToday.length>0},
-    {id:'practice',title:'Practice',desc:'Choose domain & count',icon:'✏️',clr:'#34c759',active:true},
-    {id:'exam',title:'Exam Simulation',desc:'100 Q · 3 hours · Timed',icon:'⏱',clr:'#ff9500',active:true},
-    {id:'flash',title:'Flashcards',desc:`${flashcards.length} cards`,icon:'📇',clr:'#af52de',active:true},
-    {id:'viva',title:'Viva Simulator',desc:'Oral exam practice',icon:'💬',clr:'#ff3b30',active:true},
+    {id:'review',title:'Spaced Repetition',desc:`${dueToday.length} cards due`,icon:'🔄',clr:'#0071e3'},
+    {id:'practice',title:'Random Practice',desc:'Mixed domains, random order',icon:'🎲',clr:'#34c759'},
+    {id:'exam',title:'Exam Simulation',desc:'100 Q · 3 hours · Timed',icon:'⏱',clr:'#ff9500'},
+    {id:'flash',title:'Flashcards',desc:`${flashcards.length} cards`,icon:'📇',clr:'#af52de'},
+    {id:'viva',title:'Viva Simulator',desc:'Oral exam practice',icon:'💬',clr:'#ff3b30'},
   ];
 
   return(
-    <div className="space-y-4">
+    <div className="space-y-5">
       <h1 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>Study</h1>
-      <div className="space-y-3">
-        {modes.map(m=>(
-          <button key={m.id} onClick={()=>nav('study',m.id)}
-            className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
-            style={m.id==='review'&&dueToday.length>0?{border:'2px solid #0071e3'}:{}}>
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xl" style={{background:m.clr+'18'}}>{m.icon}</div>
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold" style={{color:'#1d1d1f'}}>{m.title}</p>
-              <p className="text-sm" style={{color:'#86868b'}}>{m.desc}</p>
+
+      {/* ── Focused Study (Topic-by-Topic) ── */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>Topic by Topic</p>
+
+        {/* Recommendation banner */}
+        {weakest.length>0&&weakest[0].count>0&&(
+          <button onClick={()=>nav('study','focused:'+weakest[0].d)}
+            className="card w-full p-4 flex items-center gap-4 text-left mb-3 transition-all active:scale-[0.98]"
+            style={{border:'2px solid #0071e3'}}>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{background:'#0071e3'}}>
+              <span className="text-xl">🎯</span>
             </div>
-            <Icon name="arrow" size={16} color="#86868b"/>
+            <div className="flex-1 min-w-0">
+              <p className="font-semibold" style={{color:'#1d1d1f'}}>Recommended: {weakest[0].d}</p>
+              <p className="text-sm" style={{color:'#86868b'}}>
+                {weakest[0].unseen>0?`${weakest[0].unseen} unseen question${weakest[0].unseen>1?'s':''}`:
+                 `Weakest domain — ${weakest[0].pct}% accuracy`}
+              </p>
+            </div>
+            <Icon name="arrow" size={16} color="#0071e3"/>
           </button>
-        ))}
+        )}
+
+        <div className="space-y-2">
+          {domainInfo.map(di=>{
+            const progress=di.count>0?Math.round(di.reviewed/di.count*100):0;
+            return(
+              <button key={di.d} onClick={()=>nav('study','focused:'+di.d)}
+                className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:DOM_CLR[di.d]+'18'}}>
+                  <span className="w-3 h-3 rounded-full" style={{background:DOM_CLR[di.d]}}/>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>{di.d}</p>
+                    <span className="text-xs" style={{color:'#86868b'}}>{di.reviewed}/{di.count}</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full" style={{background:'#e5e5ea'}}>
+                    <div className="h-1.5 rounded-full transition-all" style={{width:`${Math.max(progress,2)}%`,background:DOM_CLR[di.d]}}/>
+                  </div>
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs" style={{color:'#86868b'}}>{progress}% covered</span>
+                    {di.total>0&&<span className="text-xs" style={{color:di.pct>=70?'#34c759':di.pct>=50?'#ff9500':'#ff3b30'}}>{di.pct}% correct</span>}
+                  </div>
+                </div>
+                <Icon name="arrow" size={14} color="#86868b"/>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* ── Other Study Modes ── */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>Other Modes</p>
+        <div className="space-y-2">
+          {modes.map(m=>(
+            <button key={m.id} onClick={()=>nav('study',m.id)}
+              className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+              style={m.id==='review'&&dueToday.length>0?{border:'2px solid #0071e3'}:{}}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:m.clr+'18'}}>{m.icon}</div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>{m.title}</p>
+                <p className="text-xs" style={{color:'#86868b'}}>{m.desc}</p>
+              </div>
+              <Icon name="arrow" size={14} color="#86868b"/>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -684,6 +805,165 @@ function PracticeSession({questions,rateQ,nav}){
     <div className="space-y-4">
       <BackBtn onClick={()=>setStarted(false)} label="Back"/>
       <QCard key={pool[idx].id+'-'+idx} q={pool[idx]} onRate={rate} idx={idx} total={pool.length}/>
+    </div>
+  );
+}
+
+// ━━━ FOCUSED SESSION (Topic-by-Topic) ━━━━━━━━━━━━━━━━━━━━━━━
+function FocusedSession({domain,questions,rateQ,nav}){
+  const domainQs=useMemo(()=>questions.filter(q=>q.domain===domain),[questions,domain]);
+  const[viewTab,setViewTab]=useState('unseen');
+  const[idx,setIdx]=useState(0);
+  const[started,setStarted]=useState(false);
+  const[pool,setPool]=useState([]);
+  const[done,setDone]=useState(0);
+
+  const unseen=domainQs.filter(q=>!q.history||q.history.length===0);
+  const seen=domainQs.filter(q=>q.history&&q.history.length>0);
+  const weak=seen.filter(q=>{const last=q.history[q.history.length-1];return last&&last.g<2});
+  const strong=seen.filter(q=>{const last=q.history[q.history.length-1];return last&&last.g>=2});
+
+  const startSession=(qs)=>{
+    if(!qs.length)return;
+    setPool([...qs]);setIdx(0);setDone(0);setStarted(true);
+  };
+  const rate=(id,g)=>{try{rateQ(id,g)}catch(e){console.error(e)}setDone(d=>d+1);setIdx(i=>i+1)};
+
+  if(started){
+    const card=pool[idx]?questions.find(q=>q.id===pool[idx].id):null;
+    if(!card||idx>=pool.length)return(
+      <div className="text-center py-16 space-y-3">
+        <BackBtn onClick={()=>setStarted(false)} label={domain}/>
+        <p className="text-5xl">✓</p>
+        <h2 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>Section Complete</h2>
+        <p className="text-sm" style={{color:'#86868b'}}>Reviewed {done} question{done>1?'s':''} in {domain}</p>
+        <button onClick={()=>setStarted(false)} className="btn-primary">Back to Topic</button>
+      </div>
+    );
+    return(
+      <div className="space-y-4">
+        <BackBtn onClick={()=>setStarted(false)} label={domain}/>
+        <div className="flex items-center justify-between">
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full text-white" style={{background:DOM_CLR[domain]}}>{domain}</span>
+          <span className="text-sm" style={{color:'#86868b'}}>{idx+1} of {pool.length}</span>
+        </div>
+        <div className="w-full h-1.5 rounded-full" style={{background:'#e5e5ea'}}>
+          <div className="h-1.5 rounded-full transition-all" style={{width:`${idx/pool.length*100}%`,background:DOM_CLR[domain]}}/>
+        </div>
+        <QCard key={card.id+'-'+idx} q={card} onRate={rate} idx={idx} total={pool.length}/>
+      </div>
+    );
+  }
+
+  // Topic overview
+  const accuracy=seen.length?Math.round(seen.reduce((s,q)=>{
+    const g=(q.history||[]).filter(h=>h.g>=2).length;
+    const t=(q.history||[]).length;
+    return s+(t?g/t:0);
+  },0)/seen.length*100):0;
+
+  return(
+    <div className="space-y-5">
+      <BackBtn onClick={()=>nav('study')} label="Study"/>
+
+      {/* Topic header */}
+      <div className="card p-5">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="w-4 h-4 rounded-full" style={{background:DOM_CLR[domain]}}/>
+          <h1 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>{domain}</h1>
+        </div>
+        <div className="grid grid-cols-3 gap-3 text-center">
+          <div>
+            <p className="text-xl font-bold" style={{color:'#1d1d1f'}}>{domainQs.length}</p>
+            <p className="text-xs" style={{color:'#86868b'}}>Total</p>
+          </div>
+          <div>
+            <p className="text-xl font-bold" style={{color:unseen.length>0?'#ff9500':'#34c759'}}>{unseen.length}</p>
+            <p className="text-xs" style={{color:'#86868b'}}>Unseen</p>
+          </div>
+          <div>
+            <p className="text-xl font-bold" style={{color:accuracy>=70?'#34c759':accuracy>=50?'#ff9500':'#ff3b30'}}>{seen.length?accuracy+'%':'—'}</p>
+            <p className="text-xs" style={{color:'#86868b'}}>Accuracy</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Study options */}
+      <div className="space-y-2">
+        {unseen.length>0&&(
+          <button onClick={()=>startSession(unseen)}
+            className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
+            style={{border:'2px solid '+DOM_CLR[domain]}}>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:DOM_CLR[domain]+'18'}}>📖</div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Learn New ({unseen.length})</p>
+              <p className="text-xs" style={{color:'#86868b'}}>Work through unseen questions sequentially</p>
+            </div>
+            <Icon name="arrow" size={14} color="#86868b"/>
+          </button>
+        )}
+
+        {weak.length>0&&(
+          <button onClick={()=>startSession(weak)}
+            className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#ff3b3018'}}>🔴</div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Review Weak ({weak.length})</p>
+              <p className="text-xs" style={{color:'#86868b'}}>Questions you last rated Again or Hard</p>
+            </div>
+            <Icon name="arrow" size={14} color="#86868b"/>
+          </button>
+        )}
+
+        {strong.length>0&&(
+          <button onClick={()=>startSession(strong)}
+            className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#34c75918'}}>🟢</div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Reinforce Strong ({strong.length})</p>
+              <p className="text-xs" style={{color:'#86868b'}}>Questions you know — keep them sharp</p>
+            </div>
+            <Icon name="arrow" size={14} color="#86868b"/>
+          </button>
+        )}
+
+        <button onClick={()=>startSession(domainQs)}
+          className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#5856d718'}}>📋</div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>All Questions ({domainQs.length})</p>
+            <p className="text-xs" style={{color:'#86868b'}}>Full pass through the entire topic</p>
+          </div>
+          <Icon name="arrow" size={14} color="#86868b"/>
+        </button>
+      </div>
+
+      {/* Question list */}
+      {domainQs.length>0&&(
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>
+            Questions in this topic
+          </p>
+          {domainQs.map((q,i)=>{
+            const reviewed=q.history&&q.history.length>0;
+            const lastGrade=reviewed?q.history[q.history.length-1].g:null;
+            const statusClr=!reviewed?'#d2d2d7':lastGrade>=2?'#34c759':'#ff3b30';
+            const statusTxt=!reviewed?'Unseen':lastGrade>=3?'Easy':lastGrade>=2?'Good':lastGrade>=1?'Hard':'Again';
+            return(
+              <div key={q.id} className="flex items-start gap-3 py-3" style={{borderTop:i?'1px solid #f5f5f7':'none'}}>
+                <span className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{background:statusClr}}/>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm line-clamp-2" style={{color:'#1d1d1f'}}>{q.stem}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-xs" style={{color:statusClr}}>{statusTxt}</span>
+                    {reviewed&&<span className="text-xs" style={{color:'#86868b'}}>· {q.history.length} review{q.history.length>1?'s':''}</span>}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
