@@ -1155,8 +1155,8 @@ function FlashSession({flashcards,setFlashcards,nav}){
         </div>
         <p className="text-xs text-center" style={{color:'#86868b'}}>Tap to flip - {idx%flashcards.length+1}/{flashcards.length}</p>
         <div className="flex gap-3 justify-center">
-          <button onClick={()=>{setIdx(i=>i-1<0?flashcards.length-1:i-1);setFlipped(false)}} className="btn-secondary"><- Prev</button>
-          <button onClick={()=>{setIdx(i=>i+1);setFlipped(false)}} className="btn-primary">Next -></button>
+          <button onClick={()=>{setIdx(i=>i-1<0?flashcards.length-1:i-1);setFlipped(false)}} className="btn-secondary">Prev</button>
+          <button onClick={()=>{setIdx(i=>i+1);setFlipped(false)}} className="btn-primary">Next</button>
         </div>
       </div>
     );
@@ -1398,7 +1398,7 @@ function Cases({cases,setCases,tickStreak,nav}){
                 <p className="text-sm leading-relaxed" style={{color:'#3a3a3c'}}>{q.explanation}</p>
               </div>
               <button onClick={next} className="btn-primary w-full">
-                {step<active.questions.length-1?'Next Step ->':'Finish Case'}
+                {step<active.questions.length-1?'Next Step':'Finish Case'}
               </button>
             </div>
           )}
