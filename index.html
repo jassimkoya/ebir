@@ -88,7 +88,7 @@ const DOM_CLR={'Basic Sciences':'#af52de','Vascular IR':'#0071e3','Non-Vascular 
 // EBIR Priority System (from EBIR Blueprint colour coding)
 const PRIORITIES=['high','medium','low'];
 const PRI_LABEL={high:'High Yield',medium:'Standard',low:'Low Yield'};
-const PRI_CLR={high:'#7c3aed',medium:'#3b82f6',low:'#9ca3af'};  // lavender ‚Üí light blue ‚Üí light grey
+const PRI_CLR={high:'#7c3aed',medium:'#3b82f6',low:'#9ca3af'};  // lavender -> light blue -> light grey
 const PRI_BG={high:'#7c3aed12',medium:'#3b82f612',low:'#9ca3af10'};
 
 // Confidence rating colours (original)
@@ -105,9 +105,9 @@ const SEED_Q=[
    explanation:'cTACE with lipiodol-doxorubicin remains the most validated first-line transarterial bridging therapy for HCC per EASL/BCLC guidelines.',
    domain:'Oncologic IR',difficulty:3,source:'CIRSE EBIR Syllabus',priority:'high'},
   {id:'s2',stem:'During a TIPS procedure, the target portal venous pressure gradient (HVPG) reduction is:',
-   options:['< 5 mmHg','< 12 mmHg or ‚â• 20% reduction from baseline','< 20 mmHg','Complete normalisation to 0 mmHg'],correct:1,
-   explanation:'TIPS aims to reduce HVPG below 12 mmHg or achieve ‚â•20% reduction. This threshold reduces variceal rebleeding risk.',
-   domain:'Vascular IR',difficulty:2,source:'CIRSE Standards ‚Äì TIPS',priority:'medium'},
+   options:['< 5 mmHg','< 12 mmHg or >= 20% reduction from baseline','< 20 mmHg','Complete normalisation to 0 mmHg'],correct:1,
+   explanation:'TIPS aims to reduce HVPG below 12 mmHg or achieve >=20% reduction. This threshold reduces variceal rebleeding risk.',
+   domain:'Vascular IR',difficulty:2,source:'CIRSE Standards - TIPS',priority:'medium'},
   {id:'s3',stem:'The maximum recommended skin entrance dose to avoid deterministic injury in a single IR procedure is:',
    options:['1 Gy','2 Gy','5 Gy','10 Gy'],correct:1,
    explanation:'The threshold for transient erythema is ~2 Gy. Above 2 Gy, deterministic skin effects become likely.',
@@ -119,7 +119,7 @@ const SEED_Q=[
   {id:'s5',stem:'Which imaging modality is the gold standard for mRECIST assessment of HCC post locoregional therapy?',
    options:['Contrast-enhanced ultrasound','Multiphasic contrast-enhanced MRI','Non-contrast CT','PET-CT with FDG'],correct:1,
    explanation:'Multiphasic CE-MRI provides superior characterisation of viable vs necrotic tumour for mRECIST assessment.',
-   domain:'Imaging',difficulty:3,source:'EASL Guidelines ‚Äì HCC',priority:'high'}
+   domain:'Imaging',difficulty:3,source:'EASL Guidelines - HCC',priority:'high'}
 ];
 
 const SEED_CASES=[
@@ -132,8 +132,8 @@ const SEED_CASES=[
       extra:'Doppler confirmed high-grade stenosis. Conventional angiography performed.'},
      {stem:'High-grade transplant renal artery stenosis is confirmed. Most appropriate treatment?',type:'single',
       options:['Covered stent','Balloon angioplasty (PTA)','Primary bare stent','Cutting balloon'],
-      correct:1,explanation:'PTA alone is first-line (70‚Äì85% success). Stenting reserved for failed PTA, elastic recoil, or flow-limiting dissection.',
-      extra:'PTA performed with 7√ó20 mm balloon. Post-PTA angiogram shows acute transplant renal artery thrombosis.'},
+      correct:1,explanation:'PTA alone is first-line (70-85% success). Stenting reserved for failed PTA, elastic recoil, or flow-limiting dissection.',
+      extra:'PTA performed with 7x20 mm balloon. Post-PTA angiogram shows acute transplant renal artery thrombosis.'},
      {stem:'Post-PTA shows acute thrombosis. Appropriate management? Select THREE.',type:'multi',
       options:['Surgical thrombectomy referral','Suction catheter thrombectomy','Repeat angioplasty','Local thrombolytic injection'],
       correct:[0,1,2],explanation:'Graft-threatening emergency requiring rapid reperfusion: surgical thrombectomy, aspiration thrombectomy, or repeat PTA for underlying dissection. Thrombolysis is too slow.',
@@ -147,7 +147,7 @@ const SEED_CASES=[
    questions:[
      {stem:'Which is an ABSOLUTE contraindication to colonic stent placement?',type:'single',
       options:['Oedema of transverse colon','Perforation','Obstruction at splenic flexure','Colo-vesical fistula'],
-      correct:1,explanation:'Perforation is absolute ‚Äî stenting would cause peritoneal contamination. Oedema and splenic flexure location are technical challenges, not contraindications.',
+      correct:1,explanation:'Perforation is absolute - stenting would cause peritoneal contamination. Oedema and splenic flexure location are technical challenges, not contraindications.',
       extra:'CT confirmed LBO without pneumoperitoneum. Decision for colonic stenting.'},
      {stem:'Why choose stenting over emergency surgery? Select TWO.',type:'multi',
       options:['Lower mortality','Lower stoma rate','Shorter ICU stay','Better cancer survival'],
@@ -159,7 +159,7 @@ const SEED_CASES=[
       extra:'12 cm SEMS placed. Central portion remains narrowed immediately post-deployment.'},
      {stem:'SEMS central portion narrowed immediately after deployment. Next action?',type:'single',
       options:['Co-axial balloon-mounted stent','Balloon dilatation','Defunctioning colostomy','End procedure and monitor'],
-      correct:3,explanation:'Normal ‚Äî SEMS self-expand over 24‚Äì72 hours. Immediate balloon dilatation risks perforation.',
+      correct:3,explanation:'Normal - SEMS self-expand over 24-72 hours. Immediate balloon dilatation risks perforation.',
       extra:'16 hours later: multiple episodes of liquid diarrhoea.'},
      {stem:'16 hours post-stent: liquid diarrhoea and disturbed sleep. Next action?',type:'single',
       options:['Reassure and arrange abdominal radiograph','Prescribe loperamide','Stool culture','Isolate and give IV metronidazole'],
@@ -182,8 +182,8 @@ const SEED_CASES=[
       extra:'TACE planned.'},
      {stem:'Appropriate TACE materials? Select TWO.',type:'multi',
       options:['Doxorubicin-loaded DEB-TACE','Lipiodol + doxorubicin + Gelfoam (cTACE)','Non-spherical PVA + doxorubicin','Irinotecan-loaded beads (DEBIRI)'],
-      correct:[0,1],explanation:'DEB-TACE (validated, reduced systemic exposure ‚Äî important given cardiac history) and cTACE (established evidence). DEBIRI is for colorectal mets, not HCC.',
-      extra:'DEB-TACE performed. One week later: fever 38.7¬∞C and epigastric pain.'},
+      correct:[0,1],explanation:'DEB-TACE (validated, reduced systemic exposure - important given cardiac history) and cTACE (established evidence). DEBIRI is for colorectal mets, not HCC.',
+      extra:'DEB-TACE performed. One week later: fever 38.7 deg C and epigastric pain.'},
      {stem:'One week post-TACE: fever and epigastric pain. Next steps? Select THREE.',type:'multi',
       options:['Reassure and discharge','Blood tests + CT scan','Admit and IV antibiotics','Percutaneous aspiration','ECG and cardiac enzymes'],
       correct:[1,2,4],explanation:'Late fever (>72h) requires abscess exclusion: bloods + CT, empirical antibiotics. ECG/cardiac enzymes essential given STEMI history + cardiotoxic doxorubicin.'}
@@ -192,13 +192,13 @@ const SEED_CASES=[
 
 const VIVA_PROMPTS=[
   {prompt:'Justify your decision to perform TIPS in a Child-Pugh B patient with refractory ascites who has had two previous large volume paracenteses this month.',
-   model:'TIPS is indicated for refractory ascites requiring frequent LVP (>3/month) despite optimal diuretics. In Child-Pugh B, TIPS improves transplant-free survival vs repeated paracentesis (AASLD 2017). Prerequisites: MELD <18, no prior encephalopathy, adequate cardiac function (echo), patent portal/hepatic veins. Risks: 25‚Äì30% hepatic encephalopathy, need for covered stents. Target HVPG <12 mmHg.'},
+   model:'TIPS is indicated for refractory ascites requiring frequent LVP (>3/month) despite optimal diuretics. In Child-Pugh B, TIPS improves transplant-free survival vs repeated paracentesis (AASLD 2017). Prerequisites: MELD <18, no prior encephalopathy, adequate cardiac function (echo), patent portal/hepatic veins. Risks: 25-30% hepatic encephalopathy, need for covered stents. Target HVPG <12 mmHg.'},
   {prompt:'Describe your approach to bronchial artery embolisation for massive haemoptysis (>300 ml/24h).',
-   model:'Stabilise: secure airway (affected side down), IV access, crossmatch. CT angiography pre-procedure. 5F Cobra/Simmons catheter via CFA, select bronchial arteries (T5-T6). Identify hypervascularity, extravasation, shunts. Embolise with PVA 300‚Äì500Œºm or microspheres. Critical: identify anterior spinal artery ‚Äî do not embolise if seen. Success >90%, recurrence 10‚Äì20% at 1 year.'},
+   model:'Stabilise: secure airway (affected side down), IV access, crossmatch. CT angiography pre-procedure. 5F Cobra/Simmons catheter via CFA, select bronchial arteries (T5-T6). Identify hypervascularity, extravasation, shunts. Embolise with PVA 300-500um or microspheres. Critical: identify anterior spinal artery - do not embolise if seen. Success >90%, recurrence 10-20% at 1 year.'},
   {prompt:'Explain radiation protection principles during a complex embolisation.',
    model:'ALARA: Time (pulsed fluoro 7.5 fps, last-image-hold), Distance (extension tubing), Shielding (0.5mm Pb apron, thyroid, glasses, ceiling/table shields). Collimate tightly, II close to patient, lowest magnification. Monitor dosimeters (collar + under-apron), track air kerma/DAP. Notify physics if >5 Gy. Document dose, dermatology follow-up if >3 Gy.'},
   {prompt:'Manage a Type II endoleak at 6-month post-EVAR CT surveillance.',
-   model:'Type II: most common (10‚Äì25%). Compare sac size to 1-month baseline. Stable/shrinking: continue 6-monthly CT surveillance ‚Äî most thrombose spontaneously. Expanding (>5mm): intervene. Options: transarterial (IMA via SMA, lumbar via iliolumbar) with coils + liquid embolic; direct translumbar sac puncture; transcaval. Must embolise the NIDUS, not just feeders. If persistent after two attempts: consider surgery or relining.'}
+   model:'Type II: most common (10-25%). Compare sac size to 1-month baseline. Stable/shrinking: continue 6-monthly CT surveillance - most thrombose spontaneously. Expanding (>5mm): intervene. Options: transarterial (IMA via SMA, lumbar via iliolumbar) with coils + liquid embolic; direct translumbar sac puncture; transcaval. Must embolise the NIDUS, not just feeders. If persistent after two attempts: consider surgery or relining.'}
 ];
 
 // ‚îÅ‚îÅ‚îÅ Normalise question fields ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
@@ -223,7 +223,7 @@ class ErrBound extends Component{
   render(){
     if(this.state.err)return(
       <div style={{padding:40,textAlign:'center'}}>
-        <p style={{fontSize:48,marginBottom:16}}>‚ö†Ô∏è</p>
+        <p style={{fontSize:48,marginBottom:16}}>!</p>
         <h3 style={{fontSize:18,fontWeight:700,marginBottom:8}}>Something went wrong</h3>
         <p style={{fontSize:13,color:'#86868b',marginBottom:16,wordBreak:'break-word'}}>{String(this.state.err.message)}</p>
         <button onClick={()=>this.setState({err:null})} className="btn-primary" style={{marginRight:8}}>Retry</button>
@@ -397,7 +397,7 @@ function Home({questions,dueToday,streak,domStats,nav}){
         </div>
         <div className="card p-4 text-center">
           <p className="text-2xl font-bold" style={{color:'#ff9500'}}>
-            {streak.cur}<span className="text-base ml-0.5">üî•</span>
+            {streak.cur}
           </p>
           <p className="text-xs mt-1" style={{color:'#86868b'}}>Day Streak</p>
         </div>
@@ -438,7 +438,7 @@ function Home({questions,dueToday,streak,domStats,nav}){
                 <div className="flex-1">
                   <div className="flex items-center justify-between text-sm mb-0.5">
                     <span style={{color:'#1d1d1f',fontWeight:500}}>{PRI_LABEL[p]}</span>
-                    <span style={{color:'#86868b'}}>{qs.length} cards{unseen>0?` ¬∑ ${unseen} unseen`:total?` ¬∑ ${pct}%`:''}</span>
+                    <span style={{color:'#86868b'}}>{qs.length} cards{unseen>0?` - ${unseen} unseen`:total?` - ${pct}%`:''}</span>
                   </div>
                   <div className="w-full h-1.5 rounded-full" style={{background:'#e5e5ea'}}>
                     <div className="h-1.5 rounded-full transition-all" style={{width:`${qs.length?Math.round(reviewed.length/qs.length*100):0}%`,background:PRI_CLR[p]}}/>
@@ -450,7 +450,7 @@ function Home({questions,dueToday,streak,domStats,nav}){
         </div>
       </div>
 
-      {/* Study Plan ‚Äî weighted by priority */}
+      {/* Study Plan - weighted by priority */}
       {(()=>{
         const plan=DOMAINS.map(d=>{
           const qs=questions.filter(q=>q.domain===d);
@@ -473,14 +473,14 @@ function Home({questions,dueToday,streak,domStats,nav}){
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>Study Plan</p>
             <button onClick={()=>nav('study','focused:'+next.d)} className="w-full flex items-center gap-4 text-left transition-all active:scale-[0.98]">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{background:DOM_CLR[next.d]+'20'}}>
-                <span className="text-xl">üéØ</span>
+                <Icon name="arrow" size={20} color="#0071e3"/>
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Next up: {next.d}</p>
                 <p className="text-xs" style={{color:'#86868b'}}>
                   {next.highUnseen>0?`${next.highUnseen} high-yield unseen`:
                    next.unseen>0?`${next.unseen} unseen of ${next.count}`:
-                   `${next.pct}% accuracy ‚Äî needs reinforcement`}
+                   `${next.pct}% accuracy - needs reinforcement`}
                 </p>
               </div>
               <Icon name="arrow" size={16} color="#0071e3"/>
@@ -492,7 +492,7 @@ function Home({questions,dueToday,streak,domStats,nav}){
                   style={{background:p.highUnseen>0?DOM_CLR[p.d]+'15':'#f5f5f7',
                           color:p.highUnseen>0?DOM_CLR[p.d]:'#86868b',
                           fontWeight:p.highUnseen>0?600:400}}>
-                  {p.d.replace(' IR','')} {p.highUnseen>0?`(${p.highUnseen}üî∂)`:p.unseen>0?`(${p.unseen})`:p.total?`${p.pct}%`:''}
+                  {p.d.replace(' IR','')} {p.highUnseen>0?`(${p.highUnseen}*)`:p.unseen>0?`(${p.unseen})`:p.total?`${p.pct}%`:''}
                 </button>
               ))}
             </div>
@@ -581,11 +581,11 @@ function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vi
   });
 
   const modes=[
-    {id:'review',title:'Spaced Repetition',desc:`${dueToday.length} cards due`,icon:'üîÑ',clr:'#0071e3'},
-    {id:'practice',title:'Random Practice',desc:'Mixed domains, random order',icon:'üé≤',clr:'#34c759'},
-    {id:'exam',title:'Exam Simulation',desc:'100 Q ¬∑ 3 hours ¬∑ Timed',icon:'‚è±',clr:'#ff9500'},
-    {id:'flash',title:'Flashcards',desc:`${flashcards.length} cards`,icon:'üìá',clr:'#af52de'},
-    {id:'viva',title:'Viva Simulator',desc:'Oral exam practice',icon:'üí¨',clr:'#ff3b30'},
+    {id:'review',title:'Spaced Repetition',desc:`${dueToday.length} cards due`,icon:'SR',clr:'#0071e3'},
+    {id:'practice',title:'Random Practice',desc:'Mixed domains, random order',icon:'RP',clr:'#34c759'},
+    {id:'exam',title:'Exam Simulation',desc:'100 Q, 3 hours, Timed',icon:'EX',clr:'#ff9500'},
+    {id:'flash',title:'Flashcards',desc:`${flashcards.length} cards`,icon:'FC',clr:'#af52de'},
+    {id:'viva',title:'Viva Simulator',desc:'Oral exam practice',icon:'VS',clr:'#ff3b30'},
   ];
 
   return(
@@ -602,13 +602,13 @@ function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vi
             className="card w-full p-4 flex items-center gap-4 text-left mb-3 transition-all active:scale-[0.98]"
             style={{border:'2px solid #0071e3'}}>
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{background:'#0071e3'}}>
-              <span className="text-xl">üéØ</span>
+              <Icon name="arrow" size={20} color="#0071e3"/>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold" style={{color:'#1d1d1f'}}>Recommended: {weakest[0].d}</p>
               <p className="text-sm" style={{color:'#86868b'}}>
                 {weakest[0].unseen>0?`${weakest[0].unseen} unseen question${weakest[0].unseen>1?'s':''}`:
-                 `Weakest domain ‚Äî ${weakest[0].pct}% accuracy`}
+                 `Weakest domain - ${weakest[0].pct}% accuracy`}
               </p>
             </div>
             <Icon name="arrow" size={16} color="#0071e3"/>
@@ -697,7 +697,7 @@ function QCard({q,onRate,showSR=true,idx,total,isMulti=false,correctSet}){
           <span className="text-xs font-semibold px-2 py-0.5 rounded-md" style={{background:PRI_BG[q.priority||'medium'],color:PRI_CLR[q.priority||'medium'],border:`1px solid ${PRI_CLR[q.priority||'medium']}30`}}>{PRI_LABEL[q.priority||'medium']}</span>
           {total&&<span className="text-xs" style={{color:'#86868b'}}>{idx+1} of {total}</span>}
         </div>
-        <span className="text-xs" style={{color:'#86868b'}}>{'‚óè'.repeat(Math.min(5,q.difficulty||3))}{'‚óã'.repeat(5-Math.min(5,q.difficulty||3))}</span>
+        <span className="text-xs" style={{color:'#86868b'}}>{String(q.difficulty||3)+'/5'}</span>
       </div>
 
       <div className="p-5 space-y-4">
@@ -720,8 +720,8 @@ function QCard({q,onRate,showSR=true,idx,total,isMulti=false,correctSet}){
                 style={{border:`1.5px solid ${border}`,background:bg}}>
                 <span className="font-semibold text-sm mt-0.5 w-5" style={{color:show&&isCor?'#34c759':'#86868b'}}>{letters[i]}</span>
                 <span className="text-sm flex-1" style={{color:txtClr}}>{opt}</span>
-                {show&&isCor&&<span style={{color:'#34c759'}}>‚úì</span>}
-                {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>‚úï</span>}
+                {show&&isCor&&<span style={{color:'#34c759'}}>OK</span>}
+                {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>X</span>}
               </button>
             );
           })}
@@ -785,7 +785,7 @@ function ReviewSession({questions,dueToday,rateQ,nav}){
     return(
       <div className="text-center py-16 space-y-3">
         <BackBtn onClick={()=>nav('study')} label="Study"/>
-        <p className="text-5xl">‚úì</p>
+        <p className="text-5xl">OK</p>
         <h2 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>{done?'All caught up':'No cards due'}</h2>
         <p className="text-sm" style={{color:'#86868b'}}>{done?`Reviewed ${done} card${done>1?'s':''}`:''}</p>
       </div>
@@ -849,7 +849,7 @@ function PracticeSession({questions,rateQ,nav}){
 
   if(idx>=pool.length)return(
     <div className="text-center py-16 space-y-3">
-      <p className="text-5xl">‚úì</p>
+      <p className="text-5xl">OK</p>
       <h2 className="text-2xl font-bold">Practice Complete</h2>
       <p className="text-sm" style={{color:'#86868b'}}>{pool.length} questions reviewed</p>
       <button onClick={()=>setStarted(false)} className="btn-primary">New Session</button>
@@ -893,7 +893,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
     if(!card||idx>=pool.length)return(
       <div className="text-center py-16 space-y-3">
         <BackBtn onClick={()=>setStarted(false)} label={domain}/>
-        <p className="text-5xl">‚úì</p>
+        <p className="text-5xl">OK</p>
         <h2 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>Section Complete</h2>
         <p className="text-sm" style={{color:'#86868b'}}>Reviewed {done} question{done>1?'s':''} in {domain}</p>
         <button onClick={()=>setStarted(false)} className="btn-primary">Back to Topic</button>
@@ -941,7 +941,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
             <p className="text-xs" style={{color:'#86868b'}}>Unseen</p>
           </div>
           <div>
-            <p className="text-xl font-bold" style={{color:accuracy>=70?'#34c759':accuracy>=50?'#ff9500':'#ff3b30'}}>{seen.length?accuracy+'%':'‚Äî'}</p>
+            <p className="text-xl font-bold" style={{color:accuracy>=70?'#34c759':accuracy>=50?'#ff9500':'#ff3b30'}}>{seen.length?accuracy+'%':'-'}</p>
             <p className="text-xs" style={{color:'#86868b'}}>Accuracy</p>
           </div>
         </div>
@@ -953,7 +953,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
           <button onClick={()=>startSession(unseen)}
             className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
             style={{border:'2px solid '+DOM_CLR[domain]}}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:DOM_CLR[domain]+'18'}}>üìñ</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:DOM_CLR[domain]+'18'}}>+</div>
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Learn New ({unseen.length})</p>
               <p className="text-xs" style={{color:'#86868b'}}>Work through unseen questions sequentially</p>
@@ -965,7 +965,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
         {weak.length>0&&(
           <button onClick={()=>startSession(weak)}
             className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#ff3b3018'}}>üî¥</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#ff3b3018'}}>*</div>
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Review Weak ({weak.length})</p>
               <p className="text-xs" style={{color:'#86868b'}}>Questions you last rated Again or Hard</p>
@@ -977,10 +977,10 @@ function FocusedSession({domain,questions,rateQ,nav}){
         {strong.length>0&&(
           <button onClick={()=>startSession(strong)}
             className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#34c75918'}}>üü¢</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#34c75918'}}>*</div>
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Reinforce Strong ({strong.length})</p>
-              <p className="text-xs" style={{color:'#86868b'}}>Questions you know ‚Äî keep them sharp</p>
+              <p className="text-xs" style={{color:'#86868b'}}>Questions you know - keep them sharp</p>
             </div>
             <Icon name="arrow" size={14} color="#86868b"/>
           </button>
@@ -988,7 +988,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
 
         <button onClick={()=>startSession(domainQs)}
           className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#5856d718'}}>üìã</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#5856d718'}}>#</div>
           <div className="flex-1">
             <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>All Questions ({domainQs.length})</p>
             <p className="text-xs" style={{color:'#86868b'}}>Full pass through the entire topic</p>
@@ -1016,8 +1016,8 @@ function FocusedSession({domain,questions,rateQ,nav}){
                   <p className="text-sm line-clamp-2" style={{color:'#1d1d1f'}}>{q.stem}</p>
                   <div className="flex items-center gap-2 mt-1">
                     <span className="text-xs font-medium" style={{color:PRI_CLR[pri]}}>{PRI_LABEL[pri]}</span>
-                    <span className="text-xs" style={{color:statusClr}}>¬∑ {statusTxt}</span>
-                    {reviewed&&<span className="text-xs" style={{color:'#86868b'}}>¬∑ {q.history.length} review{q.history.length>1?'s':''}</span>}
+                    <span className="text-xs" style={{color:statusClr}}>- {statusTxt}</span>
+                    {reviewed&&<span className="text-xs" style={{color:'#86868b'}}>- {q.history.length} review{q.history.length>1?'s':''}</span>}
                   </div>
                 </div>
               </div>
@@ -1056,9 +1056,9 @@ function ExamSession({questions,rateQ,nav}){
     <div className="space-y-4">
       <BackBtn onClick={()=>nav('study')} label="Study"/>
       <div className="card p-8 text-center space-y-4">
-        <p className="text-5xl">‚è±</p>
+        <p className="text-5xl">T</p>
         <h2 className="text-2xl font-bold">EBIR Exam Simulation</h2>
-        <p className="text-sm" style={{color:'#86868b'}}>{Math.min(100,questions.length)} questions ¬∑ 3 hours</p>
+        <p className="text-sm" style={{color:'#86868b'}}>{Math.min(100,questions.length)} questions - 3 hours</p>
         <button onClick={start} className="btn-primary">Begin Exam</button>
       </div>
     </div>
@@ -1153,10 +1153,10 @@ function FlashSession({flashcards,setFlashcards,nav}){
             <p className="text-lg" style={{color:'#1d1d1f'}}>{flipped?c.back:c.front}</p>
           </div>
         </div>
-        <p className="text-xs text-center" style={{color:'#86868b'}}>Tap to flip ¬∑ {idx%flashcards.length+1}/{flashcards.length}</p>
+        <p className="text-xs text-center" style={{color:'#86868b'}}>Tap to flip - {idx%flashcards.length+1}/{flashcards.length}</p>
         <div className="flex gap-3 justify-center">
-          <button onClick={()=>{setIdx(i=>i-1<0?flashcards.length-1:i-1);setFlipped(false)}} className="btn-secondary">‚Üê Prev</button>
-          <button onClick={()=>{setIdx(i=>i+1);setFlipped(false)}} className="btn-primary">Next ‚Üí</button>
+          <button onClick={()=>{setIdx(i=>i-1<0?flashcards.length-1:i-1);setFlipped(false)}} className="btn-secondary"><- Prev</button>
+          <button onClick={()=>{setIdx(i=>i+1);setFlipped(false)}} className="btn-primary">Next -></button>
         </div>
       </div>
     );
@@ -1190,7 +1190,7 @@ function FlashSession({flashcards,setFlashcards,nav}){
             <p className="font-medium text-sm" style={{color:'#1d1d1f'}}>{c.front}</p>
             <p className="text-xs mt-0.5 truncate" style={{color:'#86868b'}}>{c.back}</p>
           </div>
-          <button onClick={()=>del(c.id)} style={{color:'#86868b'}} className="text-sm">‚úï</button>
+          <button onClick={()=>del(c.id)} style={{color:'#86868b'}} className="text-sm">X</button>
         </div>
       ))}
       {flashcards.length===0&&<p className="text-sm text-center py-8" style={{color:'#86868b'}}>No flashcards yet. Tap + Add to create one.</p>}
@@ -1212,7 +1212,7 @@ function VivaSession({vivaLog,setVivaLog,nav,tickStreak}){
     <div className="space-y-4">
       <BackBtn onClick={()=>nav('study')} label="Study"/>
       <div className="card p-8 text-center space-y-4">
-        <p className="text-5xl">üí¨</p>
+        <p className="text-5xl">"</p>
         <h2 className="text-2xl font-bold">Viva Simulator</h2>
         <p className="text-sm" style={{color:'#86868b'}}>Practise answering oral exam questions. Write your response, then compare to a model answer.</p>
         <button onClick={start} className="btn-primary">Start Viva</button>
@@ -1382,8 +1382,8 @@ function Cases({cases,setCases,tickStreak,nav}){
                   style={{border:`1.5px solid ${border}`,background:bg}}>
                   <span className="font-semibold text-sm mt-0.5 w-5" style={{color:show&&isCor?'#34c759':'#86868b'}}>{letters[i]}</span>
                   <span className="text-sm flex-1" style={{color:txtClr}}>{opt}</span>
-                  {show&&isCor&&<span style={{color:'#34c759'}}>‚úì</span>}
-                  {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>‚úï</span>}
+                  {show&&isCor&&<span style={{color:'#34c759'}}>OK</span>}
+                  {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>X</span>}
                 </button>
               );
             })}
@@ -1398,7 +1398,7 @@ function Cases({cases,setCases,tickStreak,nav}){
                 <p className="text-sm leading-relaxed" style={{color:'#3a3a3c'}}>{q.explanation}</p>
               </div>
               <button onClick={next} className="btn-primary w-full">
-                {step<active.questions.length-1?'Next Step ‚Üí':'Finish Case'}
+                {step<active.questions.length-1?'Next Step ->':'Finish Case'}
               </button>
             </div>
           )}
@@ -1462,7 +1462,7 @@ function Library({questions,setQuestions,cases,setCases,flashcards,setFlashcards
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{background:DOM_CLR[q.domain]}}>{q.domain}</span>
                 <span className="text-xs font-medium px-1.5 py-0.5 rounded" style={{background:PRI_BG[q.priority||'medium'],color:PRI_CLR[q.priority||'medium']}}>{PRI_LABEL[q.priority||'medium']}</span>
-                <span className="text-xs" style={{color:'#86868b'}}>{'‚óè'.repeat(q.difficulty)}{'‚óã'.repeat(5-q.difficulty)}</span>
+                <span className="text-xs" style={{color:'#86868b'}}>{String(q.difficulty||3)+'/5'}</span>
                 {q.history?.length>0&&<span className="text-xs ml-auto" style={{color:'#86868b'}}>{q.history.length} reviews</span>}
               </div>
               <p className="text-sm line-clamp-2" style={{color:'#1d1d1f'}}>{q.stem}</p>
@@ -1575,14 +1575,14 @@ function ImportPage({questions,setQuestions,cases,setCases,flashcards,setFlashca
     if(file.name.endsWith('.json')){
       const t=await file.text();
       setText(t);
-      flash('JSON loaded ‚Äî review and click Import');
+      flash('JSON loaded - review and click Import');
     }else if(file.name.endsWith('.pdf')){
       setPdfStatus('Extracting text from PDF...');
       try{
         const txt=await extractPdfText(file);
         setText(txt);
         setPdfStatus('');
-        flash('PDF text extracted ‚Äî edit or paste as JSON to import');
+        flash('PDF text extracted - edit or paste as JSON to import');
       }catch(err){
         setPdfStatus('');
         flash('PDF extraction failed: '+err.message);
@@ -1636,7 +1636,7 @@ function ImportPage({questions,setQuestions,cases,setCases,flashcards,setFlashca
       {/* Export */}
       <div className="card p-5 space-y-3">
         <p className="text-xs font-semibold uppercase tracking-wider" style={{color:'#86868b'}}>Export Data</p>
-        <p className="text-sm" style={{color:'#86868b'}}>{questions.length} questions ¬∑ {cases.length} cases ¬∑ {flashcards.length} flashcards</p>
+        <p className="text-sm" style={{color:'#86868b'}}>{questions.length} questions - {cases.length} cases - {flashcards.length} flashcards</p>
         <button onClick={exportAll} className="btn-primary w-full">Download JSON Backup</button>
       </div>
     </div>
@@ -1666,9 +1666,9 @@ function Settings({questions,cases,flashcards}){
       <div className="card p-5 space-y-3">
         <p className="text-xs font-semibold uppercase tracking-wider" style={{color:'#86868b'}}>Install on iPhone</p>
         <div className="flex items-start gap-3">
-          <span className="text-2xl">üì±</span>
+          <span className="text-2xl"></span>
           <div>
-            <p className="text-sm" style={{color:'#1d1d1f'}}>Open this page in Safari, then tap the <strong>Share</strong> button ‚Üí <strong>Add to Home Screen</strong>.</p>
+            <p className="text-sm" style={{color:'#1d1d1f'}}>Open this page in Safari, then tap the <strong>Share</strong> button -> <strong>Add to Home Screen</strong>.</p>
             <p className="text-xs mt-1" style={{color:'#86868b'}}>The app will work offline and appear as a native icon on your home screen.</p>
           </div>
         </div>
@@ -1683,7 +1683,7 @@ function Settings({questions,cases,flashcards}){
         </button>
       </div>
 
-      <p className="text-xs text-center py-4" style={{color:'#c7c7cc'}}>EBIR Distinction Engine ¬∑ v2.0</p>
+      <p className="text-xs text-center py-4" style={{color:'#c7c7cc'}}>EBIR Distinction Engine - v2.0</p>
     </div>
   );
 }
