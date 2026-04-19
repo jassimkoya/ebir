@@ -53,7 +53,7 @@ input,textarea,select{font-family:inherit;font-size:16px !important}
 <script type="text/babel">
 const{useState,useEffect,useCallback,useMemo,useRef,Component}=React;
 
-// ━━━ Service Worker for offline PWA ━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Service Worker for offline PWA ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 if('serviceWorker'in navigator){
   const sw=`self.addEventListener('install',e=>self.skipWaiting());
 self.addEventListener('activate',e=>self.clients.claim());
@@ -64,13 +64,13 @@ self.addEventListener('fetch',e=>{
   navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(()=>{});
 }
 
-// ━━━ Storage ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Storage ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 const S={
   get(k,fb){try{const v=localStorage.getItem('ebir_'+k);return v?JSON.parse(v):fb}catch{return fb}},
   set(k,v){try{localStorage.setItem('ebir_'+k,JSON.stringify(v))}catch(e){console.warn('Storage full',e)}},
 };
 
-// ━━━ SM-2 Algorithm ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ SM-2 Algorithm ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function sm2(card,grade){
   let{easeFactor:ef=2.5,interval:iv=0,repetitions:rp=0}=card;
   const q=[0,2,3,5][grade]||0;
@@ -80,32 +80,46 @@ function sm2(card,grade){
   return{...card,easeFactor:ef,interval:iv,repetitions:rp,nextReview:Date.now()+iv*864e5,lastReview:Date.now()};
 }
 
-// ━━━ Domains & Data ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Domains & Data ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 const DOMAINS=['Basic Sciences','Vascular IR','Non-Vascular IR','Oncologic IR','Radiation Protection','Imaging'];
 const DOM_CLR={'Basic Sciences':'#af52de','Vascular IR':'#0071e3','Non-Vascular IR':'#34c759',
                'Oncologic IR':'#ff3b30','Radiation Protection':'#ff9500','Imaging':'#5ac8fa'};
+
+// EBIR Priority System (from EBIR Blueprint colour coding)
+const PRIORITIES=['high','medium','low'];
+const PRI_LABEL={high:'High Yield',medium:'Standard',low:'Low Yield'};
+const PRI_CLR={high:'#7c3aed',medium:'#3b82f6',low:'#9ca3af'};  // lavender ‚Üí light blue ‚Üí light grey
+const PRI_BG={high:'#7c3aed12',medium:'#3b82f612',low:'#9ca3af10'};
+
+// Confidence rating colours (original)
+const CONF_CLR=[
+  {label:'Again',bg:'#ff3b30',text:'#fff'},
+  {label:'Hard',bg:'#ff9500',text:'#fff'},
+  {label:'Good',bg:'#0071e3',text:'#fff'},
+  {label:'Easy',bg:'#34c759',text:'#fff'},
+];
 
 const SEED_Q=[
   {id:'s1',stem:'A 58-year-old male with HCC within Milan criteria is referred for bridging therapy prior to liver transplantation. Which is the most appropriate first-line transarterial therapy?',
    options:['Bland embolisation (TAE)','Conventional TACE (cTACE)','Drug-eluting bead TACE (DEB-TACE)','TARE with Y-90'],correct:1,
    explanation:'cTACE with lipiodol-doxorubicin remains the most validated first-line transarterial bridging therapy for HCC per EASL/BCLC guidelines.',
-   domain:'Oncologic IR',difficulty:3,source:'CIRSE EBIR Syllabus'},
+   domain:'Oncologic IR',difficulty:3,source:'CIRSE EBIR Syllabus',priority:'high'},
   {id:'s2',stem:'During a TIPS procedure, the target portal venous pressure gradient (HVPG) reduction is:',
-   options:['< 5 mmHg','< 12 mmHg or ≥ 20% reduction from baseline','< 20 mmHg','Complete normalisation to 0 mmHg'],correct:1,
-   explanation:'TIPS aims to reduce HVPG below 12 mmHg or achieve ≥20% reduction. This threshold reduces variceal rebleeding risk.',
-   domain:'Vascular IR',difficulty:2,source:'CIRSE Standards – TIPS'},
+   options:['< 5 mmHg','< 12 mmHg or ‚â• 20% reduction from baseline','< 20 mmHg','Complete normalisation to 0 mmHg'],correct:1,
+   explanation:'TIPS aims to reduce HVPG below 12 mmHg or achieve ‚â•20% reduction. This threshold reduces variceal rebleeding risk.',
+   domain:'Vascular IR',difficulty:2,source:'CIRSE Standards ‚Äì TIPS',priority:'medium'},
   {id:'s3',stem:'The maximum recommended skin entrance dose to avoid deterministic injury in a single IR procedure is:',
    options:['1 Gy','2 Gy','5 Gy','10 Gy'],correct:1,
    explanation:'The threshold for transient erythema is ~2 Gy. Above 2 Gy, deterministic skin effects become likely.',
-   domain:'Radiation Protection',difficulty:2,source:'ICRP Publication 120'},
+   domain:'Radiation Protection',difficulty:2,source:'ICRP Publication 120',priority:'high'},
   {id:'s4',stem:'The most appropriate sclerosant for percutaneous treatment of a large symptomatic simple renal cyst is:',
    options:['Absolute ethanol','Sodium tetradecyl sulphate','Bleomycin','Polidocanol foam'],correct:0,
    explanation:'Absolute ethanol is the most established sclerosant for simple renal cysts with high success rates.',
-   domain:'Non-Vascular IR',difficulty:2,source:'CIRSE EBIR Syllabus'},
+   domain:'Non-Vascular IR',difficulty:2,source:'CIRSE EBIR Syllabus',priority:'high'},
   {id:'s5',stem:'Which imaging modality is the gold standard for mRECIST assessment of HCC post locoregional therapy?',
    options:['Contrast-enhanced ultrasound','Multiphasic contrast-enhanced MRI','Non-contrast CT','PET-CT with FDG'],correct:1,
    explanation:'Multiphasic CE-MRI provides superior characterisation of viable vs necrotic tumour for mRECIST assessment.',
-   domain:'Imaging',difficulty:3,source:'EASL Guidelines – HCC'}
+   domain:'Imaging',difficulty:3,source:'EASL Guidelines ‚Äì HCC',priority:'high'}
 ];
 
 const SEED_CASES=[
@@ -118,8 +132,8 @@ const SEED_CASES=[
       extra:'Doppler confirmed high-grade stenosis. Conventional angiography performed.'},
      {stem:'High-grade transplant renal artery stenosis is confirmed. Most appropriate treatment?',type:'single',
       options:['Covered stent','Balloon angioplasty (PTA)','Primary bare stent','Cutting balloon'],
-      correct:1,explanation:'PTA alone is first-line (70–85% success). Stenting reserved for failed PTA, elastic recoil, or flow-limiting dissection.',
-      extra:'PTA performed with 7×20 mm balloon. Post-PTA angiogram shows acute transplant renal artery thrombosis.'},
+      correct:1,explanation:'PTA alone is first-line (70‚Äì85% success). Stenting reserved for failed PTA, elastic recoil, or flow-limiting dissection.',
+      extra:'PTA performed with 7√ó20 mm balloon. Post-PTA angiogram shows acute transplant renal artery thrombosis.'},
      {stem:'Post-PTA shows acute thrombosis. Appropriate management? Select THREE.',type:'multi',
       options:['Surgical thrombectomy referral','Suction catheter thrombectomy','Repeat angioplasty','Local thrombolytic injection'],
       correct:[0,1,2],explanation:'Graft-threatening emergency requiring rapid reperfusion: surgical thrombectomy, aspiration thrombectomy, or repeat PTA for underlying dissection. Thrombolysis is too slow.',
@@ -133,7 +147,7 @@ const SEED_CASES=[
    questions:[
      {stem:'Which is an ABSOLUTE contraindication to colonic stent placement?',type:'single',
       options:['Oedema of transverse colon','Perforation','Obstruction at splenic flexure','Colo-vesical fistula'],
-      correct:1,explanation:'Perforation is absolute — stenting would cause peritoneal contamination. Oedema and splenic flexure location are technical challenges, not contraindications.',
+      correct:1,explanation:'Perforation is absolute ‚Äî stenting would cause peritoneal contamination. Oedema and splenic flexure location are technical challenges, not contraindications.',
       extra:'CT confirmed LBO without pneumoperitoneum. Decision for colonic stenting.'},
      {stem:'Why choose stenting over emergency surgery? Select TWO.',type:'multi',
       options:['Lower mortality','Lower stoma rate','Shorter ICU stay','Better cancer survival'],
@@ -145,7 +159,7 @@ const SEED_CASES=[
       extra:'12 cm SEMS placed. Central portion remains narrowed immediately post-deployment.'},
      {stem:'SEMS central portion narrowed immediately after deployment. Next action?',type:'single',
       options:['Co-axial balloon-mounted stent','Balloon dilatation','Defunctioning colostomy','End procedure and monitor'],
-      correct:3,explanation:'Normal — SEMS self-expand over 24–72 hours. Immediate balloon dilatation risks perforation.',
+      correct:3,explanation:'Normal ‚Äî SEMS self-expand over 24‚Äì72 hours. Immediate balloon dilatation risks perforation.',
       extra:'16 hours later: multiple episodes of liquid diarrhoea.'},
      {stem:'16 hours post-stent: liquid diarrhoea and disturbed sleep. Next action?',type:'single',
       options:['Reassure and arrange abdominal radiograph','Prescribe loperamide','Stool culture','Isolate and give IV metronidazole'],
@@ -168,8 +182,8 @@ const SEED_CASES=[
       extra:'TACE planned.'},
      {stem:'Appropriate TACE materials? Select TWO.',type:'multi',
       options:['Doxorubicin-loaded DEB-TACE','Lipiodol + doxorubicin + Gelfoam (cTACE)','Non-spherical PVA + doxorubicin','Irinotecan-loaded beads (DEBIRI)'],
-      correct:[0,1],explanation:'DEB-TACE (validated, reduced systemic exposure — important given cardiac history) and cTACE (established evidence). DEBIRI is for colorectal mets, not HCC.',
-      extra:'DEB-TACE performed. One week later: fever 38.7°C and epigastric pain.'},
+      correct:[0,1],explanation:'DEB-TACE (validated, reduced systemic exposure ‚Äî important given cardiac history) and cTACE (established evidence). DEBIRI is for colorectal mets, not HCC.',
+      extra:'DEB-TACE performed. One week later: fever 38.7¬∞C and epigastric pain.'},
      {stem:'One week post-TACE: fever and epigastric pain. Next steps? Select THREE.',type:'multi',
       options:['Reassure and discharge','Blood tests + CT scan','Admit and IV antibiotics','Percutaneous aspiration','ECG and cardiac enzymes'],
       correct:[1,2,4],explanation:'Late fever (>72h) requires abscess exclusion: bloods + CT, empirical antibiotics. ECG/cardiac enzymes essential given STEMI history + cardiotoxic doxorubicin.'}
@@ -178,29 +192,30 @@ const SEED_CASES=[
 
 const VIVA_PROMPTS=[
   {prompt:'Justify your decision to perform TIPS in a Child-Pugh B patient with refractory ascites who has had two previous large volume paracenteses this month.',
-   model:'TIPS is indicated for refractory ascites requiring frequent LVP (>3/month) despite optimal diuretics. In Child-Pugh B, TIPS improves transplant-free survival vs repeated paracentesis (AASLD 2017). Prerequisites: MELD <18, no prior encephalopathy, adequate cardiac function (echo), patent portal/hepatic veins. Risks: 25–30% hepatic encephalopathy, need for covered stents. Target HVPG <12 mmHg.'},
+   model:'TIPS is indicated for refractory ascites requiring frequent LVP (>3/month) despite optimal diuretics. In Child-Pugh B, TIPS improves transplant-free survival vs repeated paracentesis (AASLD 2017). Prerequisites: MELD <18, no prior encephalopathy, adequate cardiac function (echo), patent portal/hepatic veins. Risks: 25‚Äì30% hepatic encephalopathy, need for covered stents. Target HVPG <12 mmHg.'},
   {prompt:'Describe your approach to bronchial artery embolisation for massive haemoptysis (>300 ml/24h).',
-   model:'Stabilise: secure airway (affected side down), IV access, crossmatch. CT angiography pre-procedure. 5F Cobra/Simmons catheter via CFA, select bronchial arteries (T5-T6). Identify hypervascularity, extravasation, shunts. Embolise with PVA 300–500μm or microspheres. Critical: identify anterior spinal artery — do not embolise if seen. Success >90%, recurrence 10–20% at 1 year.'},
+   model:'Stabilise: secure airway (affected side down), IV access, crossmatch. CT angiography pre-procedure. 5F Cobra/Simmons catheter via CFA, select bronchial arteries (T5-T6). Identify hypervascularity, extravasation, shunts. Embolise with PVA 300‚Äì500Œºm or microspheres. Critical: identify anterior spinal artery ‚Äî do not embolise if seen. Success >90%, recurrence 10‚Äì20% at 1 year.'},
   {prompt:'Explain radiation protection principles during a complex embolisation.',
    model:'ALARA: Time (pulsed fluoro 7.5 fps, last-image-hold), Distance (extension tubing), Shielding (0.5mm Pb apron, thyroid, glasses, ceiling/table shields). Collimate tightly, II close to patient, lowest magnification. Monitor dosimeters (collar + under-apron), track air kerma/DAP. Notify physics if >5 Gy. Document dose, dermatology follow-up if >3 Gy.'},
   {prompt:'Manage a Type II endoleak at 6-month post-EVAR CT surveillance.',
-   model:'Type II: most common (10–25%). Compare sac size to 1-month baseline. Stable/shrinking: continue 6-monthly CT surveillance — most thrombose spontaneously. Expanding (>5mm): intervene. Options: transarterial (IMA via SMA, lumbar via iliolumbar) with coils + liquid embolic; direct translumbar sac puncture; transcaval. Must embolise the NIDUS, not just feeders. If persistent after two attempts: consider surgery or relining.'}
+   model:'Type II: most common (10‚Äì25%). Compare sac size to 1-month baseline. Stable/shrinking: continue 6-monthly CT surveillance ‚Äî most thrombose spontaneously. Expanding (>5mm): intervene. Options: transarterial (IMA via SMA, lumbar via iliolumbar) with coils + liquid embolic; direct translumbar sac puncture; transcaval. Must embolise the NIDUS, not just feeders. If persistent after two attempts: consider surgery or relining.'}
 ];
 
-// ━━━ Normalise question fields ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Normalise question fields ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function normQ(q){return{
   id:q.id||'q'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
   stem:String(q.stem||''),options:Array.isArray(q.options)?q.options:['','','',''],
   correct:q.correct??0,explanation:String(q.explanation||''),
   domain:DOMAINS.includes(q.domain)?q.domain:'Basic Sciences',
   difficulty:Math.max(1,Math.min(5,Number(q.difficulty)||3)),source:String(q.source||''),
+  priority:PRIORITIES.includes(q.priority)?q.priority:'medium',
   easeFactor:Number.isFinite(q.easeFactor)?q.easeFactor:2.5,interval:Number.isFinite(q.interval)?q.interval:0,
   repetitions:Number.isFinite(q.repetitions)?q.repetitions:0,
   nextReview:Number.isFinite(q.nextReview)?q.nextReview:Date.now(),lastReview:q.lastReview||null,
   history:Array.isArray(q.history)?q.history:[]
 }}
 
-// ━━━ Error Boundary ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Error Boundary ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 class ErrBound extends Component{
   state={err:null};
   static getDerivedStateFromError(err){return{err}}
@@ -208,7 +223,7 @@ class ErrBound extends Component{
   render(){
     if(this.state.err)return(
       <div style={{padding:40,textAlign:'center'}}>
-        <p style={{fontSize:48,marginBottom:16}}>⚠️</p>
+        <p style={{fontSize:48,marginBottom:16}}>‚ö†Ô∏è</p>
         <h3 style={{fontSize:18,fontWeight:700,marginBottom:8}}>Something went wrong</h3>
         <p style={{fontSize:13,color:'#86868b',marginBottom:16,wordBreak:'break-word'}}>{String(this.state.err.message)}</p>
         <button onClick={()=>this.setState({err:null})} className="btn-primary" style={{marginRight:8}}>Retry</button>
@@ -219,7 +234,7 @@ class ErrBound extends Component{
   }
 }
 
-// ━━━ PDF Text Extraction ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ PDF Text Extraction ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 async function extractPdfText(file){
   const buf=await file.arrayBuffer();
   const pdf=await pdfjsLib.getDocument({data:buf}).promise;
@@ -232,7 +247,7 @@ async function extractPdfText(file){
   return text;
 }
 
-// ━━━ Icons (SF Symbols style, inline SVGs) ━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Icons (SF Symbols style, inline SVGs) ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 const Icon=({name,size=22,color='currentColor'})=>{
   const paths={
     home:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4',
@@ -253,9 +268,9 @@ const Icon=({name,size=22,color='currentColor'})=>{
   return(<svg width={size} height={size} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={color}><path strokeLinecap="round" strokeLinejoin="round" d={paths[name]}/></svg>);
 };
 
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 //  APP
-// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function App(){
   const[tab,setTab]=useState('home');
   const[subPage,setSubPage]=useState(null);
@@ -345,7 +360,7 @@ function App(){
   );
 }
 
-// ━━━ HOME / DASHBOARD ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ HOME / DASHBOARD ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function Home({questions,dueToday,streak,domStats,nav}){
   const examDate=new Date('2026-10-15');
   const daysLeft=Math.max(0,Math.ceil((examDate-Date.now())/864e5));
@@ -382,7 +397,7 @@ function Home({questions,dueToday,streak,domStats,nav}){
         </div>
         <div className="card p-4 text-center">
           <p className="text-2xl font-bold" style={{color:'#ff9500'}}>
-            {streak.cur}<span className="text-base ml-0.5">🔥</span>
+            {streak.cur}<span className="text-base ml-0.5">üî•</span>
           </p>
           <p className="text-xs mt-1" style={{color:'#86868b'}}>Day Streak</p>
         </div>
@@ -406,16 +421,48 @@ function Home({questions,dueToday,streak,domStats,nav}){
         </button>
       )}
 
-      {/* Study Plan */}
+      {/* EBIR Priority Breakdown */}
+      <div className="card p-5">
+        <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>EBIR Priority</p>
+        <div className="space-y-2.5">
+          {PRIORITIES.map(p=>{
+            const qs=questions.filter(q=>(q.priority||'medium')===p);
+            const reviewed=qs.filter(q=>q.history&&q.history.length>0);
+            const correct=qs.reduce((s,q)=>(q.history||[]).filter(h=>h.g>=2).length+s,0);
+            const total=qs.reduce((s,q)=>(q.history||[]).length+s,0);
+            const pct=total?Math.round(correct/total*100):0;
+            const unseen=qs.length-reviewed.length;
+            return(
+              <div key={p} className="flex items-center gap-3">
+                <span className="w-2 h-8 rounded-full" style={{background:PRI_CLR[p]}}/>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between text-sm mb-0.5">
+                    <span style={{color:'#1d1d1f',fontWeight:500}}>{PRI_LABEL[p]}</span>
+                    <span style={{color:'#86868b'}}>{qs.length} cards{unseen>0?` ¬∑ ${unseen} unseen`:total?` ¬∑ ${pct}%`:''}</span>
+                  </div>
+                  <div className="w-full h-1.5 rounded-full" style={{background:'#e5e5ea'}}>
+                    <div className="h-1.5 rounded-full transition-all" style={{width:`${qs.length?Math.round(reviewed.length/qs.length*100):0}%`,background:PRI_CLR[p]}}/>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Study Plan ‚Äî weighted by priority */}
       {(()=>{
         const plan=DOMAINS.map(d=>{
           const qs=questions.filter(q=>q.domain===d);
           const unseen=qs.filter(q=>!q.history||q.history.length===0).length;
+          const highUnseen=qs.filter(q=>(q.priority||'medium')==='high'&&(!q.history||q.history.length===0)).length;
           const total=qs.reduce((s,q)=>(q.history||[]).length+s,0);
           const correct=qs.reduce((s,q)=>(q.history||[]).filter(h=>h.g>=2).length+s,0);
           const pct=total?Math.round(correct/total*100):0;
-          return{d,count:qs.length,unseen,pct,total};
+          return{d,count:qs.length,unseen,highUnseen,pct,total};
         }).filter(d=>d.count>0).sort((a,b)=>{
+          // Prioritise domains with most unseen HIGH-YIELD questions
+          if(a.highUnseen!==b.highUnseen)return b.highUnseen-a.highUnseen;
           if(a.unseen!==b.unseen)return b.unseen-a.unseen;
           return a.pct-b.pct;
         });
@@ -426,13 +473,14 @@ function Home({questions,dueToday,streak,domStats,nav}){
             <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>Study Plan</p>
             <button onClick={()=>nav('study','focused:'+next.d)} className="w-full flex items-center gap-4 text-left transition-all active:scale-[0.98]">
               <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{background:DOM_CLR[next.d]+'20'}}>
-                <span className="text-xl">🎯</span>
+                <span className="text-xl">üéØ</span>
               </div>
               <div className="flex-1">
                 <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Next up: {next.d}</p>
                 <p className="text-xs" style={{color:'#86868b'}}>
-                  {next.unseen>0?`${next.unseen} unseen of ${next.count}`:
-                   `${next.pct}% accuracy — needs reinforcement`}
+                  {next.highUnseen>0?`${next.highUnseen} high-yield unseen`:
+                   next.unseen>0?`${next.unseen} unseen of ${next.count}`:
+                   `${next.pct}% accuracy ‚Äî needs reinforcement`}
                 </p>
               </div>
               <Icon name="arrow" size={16} color="#0071e3"/>
@@ -441,10 +489,10 @@ function Home({questions,dueToday,streak,domStats,nav}){
               {plan.map(p=>(
                 <button key={p.d} onClick={()=>nav('study','focused:'+p.d)}
                   className="text-xs px-2.5 py-1.5 rounded-lg transition-all active:scale-95"
-                  style={{background:p.unseen>0?DOM_CLR[p.d]+'15':'#f5f5f7',
-                          color:p.unseen>0?DOM_CLR[p.d]:'#86868b',
-                          fontWeight:p.unseen>0?600:400}}>
-                  {p.d.replace(' IR','')} {p.unseen>0?`(${p.unseen})`:p.total?`${p.pct}%`:''}
+                  style={{background:p.highUnseen>0?DOM_CLR[p.d]+'15':'#f5f5f7',
+                          color:p.highUnseen>0?DOM_CLR[p.d]:'#86868b',
+                          fontWeight:p.highUnseen>0?600:400}}>
+                  {p.d.replace(' IR','')} {p.highUnseen>0?`(${p.highUnseen}üî∂)`:p.unseen>0?`(${p.unseen})`:p.total?`${p.pct}%`:''}
                 </button>
               ))}
             </div>
@@ -506,7 +554,7 @@ function Home({questions,dueToday,streak,domStats,nav}){
   );
 }
 
-// ━━━ STUDY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ STUDY ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vivaLog,setVivaLog,tickStreak}){
   if(subPage==='review')return<ReviewSession questions={questions} dueToday={dueToday} rateQ={rateQ} nav={nav}/>;
   if(subPage==='practice')return<PracticeSession questions={questions} rateQ={rateQ} nav={nav}/>;
@@ -533,18 +581,18 @@ function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vi
   });
 
   const modes=[
-    {id:'review',title:'Spaced Repetition',desc:`${dueToday.length} cards due`,icon:'🔄',clr:'#0071e3'},
-    {id:'practice',title:'Random Practice',desc:'Mixed domains, random order',icon:'🎲',clr:'#34c759'},
-    {id:'exam',title:'Exam Simulation',desc:'100 Q · 3 hours · Timed',icon:'⏱',clr:'#ff9500'},
-    {id:'flash',title:'Flashcards',desc:`${flashcards.length} cards`,icon:'📇',clr:'#af52de'},
-    {id:'viva',title:'Viva Simulator',desc:'Oral exam practice',icon:'💬',clr:'#ff3b30'},
+    {id:'review',title:'Spaced Repetition',desc:`${dueToday.length} cards due`,icon:'üîÑ',clr:'#0071e3'},
+    {id:'practice',title:'Random Practice',desc:'Mixed domains, random order',icon:'üé≤',clr:'#34c759'},
+    {id:'exam',title:'Exam Simulation',desc:'100 Q ¬∑ 3 hours ¬∑ Timed',icon:'‚è±',clr:'#ff9500'},
+    {id:'flash',title:'Flashcards',desc:`${flashcards.length} cards`,icon:'üìá',clr:'#af52de'},
+    {id:'viva',title:'Viva Simulator',desc:'Oral exam practice',icon:'üí¨',clr:'#ff3b30'},
   ];
 
   return(
     <div className="space-y-5">
       <h1 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>Study</h1>
 
-      {/* ── Focused Study (Topic-by-Topic) ── */}
+      {/* ‚îÄ‚îÄ Focused Study (Topic-by-Topic) ‚îÄ‚îÄ */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>Topic by Topic</p>
 
@@ -554,13 +602,13 @@ function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vi
             className="card w-full p-4 flex items-center gap-4 text-left mb-3 transition-all active:scale-[0.98]"
             style={{border:'2px solid #0071e3'}}>
             <div className="w-12 h-12 rounded-2xl flex items-center justify-center" style={{background:'#0071e3'}}>
-              <span className="text-xl">🎯</span>
+              <span className="text-xl">üéØ</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="font-semibold" style={{color:'#1d1d1f'}}>Recommended: {weakest[0].d}</p>
               <p className="text-sm" style={{color:'#86868b'}}>
                 {weakest[0].unseen>0?`${weakest[0].unseen} unseen question${weakest[0].unseen>1?'s':''}`:
-                 `Weakest domain — ${weakest[0].pct}% accuracy`}
+                 `Weakest domain ‚Äî ${weakest[0].pct}% accuracy`}
               </p>
             </div>
             <Icon name="arrow" size={16} color="#0071e3"/>
@@ -596,7 +644,7 @@ function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vi
         </div>
       </div>
 
-      {/* ── Other Study Modes ── */}
+      {/* ‚îÄ‚îÄ Other Study Modes ‚îÄ‚îÄ */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wider mb-3" style={{color:'#86868b',letterSpacing:'0.05em'}}>Other Modes</p>
         <div className="space-y-2">
@@ -618,7 +666,7 @@ function Study({questions,dueToday,rateQ,nav,subPage,flashcards,setFlashcards,vi
   );
 }
 
-// ━━━ Shared Question UI ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Shared Question UI ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function QCard({q,onRate,showSR=true,idx,total,isMulti=false,correctSet}){
   const[sel,setSel]=useState(isMulti?[]:[]);
   const[show,setShow]=useState(false);
@@ -644,11 +692,12 @@ function QCard({q,onRate,showSR=true,idx,total,isMulti=false,correctSet}){
     <div className="card overflow-hidden fade-in">
       {/* Header */}
       <div className="px-5 py-3 flex items-center justify-between" style={{borderBottom:'1px solid #f0f0f0'}}>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="text-xs font-semibold px-2.5 py-1 rounded-full text-white" style={{background:DOM_CLR[q.domain]||'#86868b'}}>{q.domain}</span>
+          <span className="text-xs font-semibold px-2 py-0.5 rounded-md" style={{background:PRI_BG[q.priority||'medium'],color:PRI_CLR[q.priority||'medium'],border:`1px solid ${PRI_CLR[q.priority||'medium']}30`}}>{PRI_LABEL[q.priority||'medium']}</span>
           {total&&<span className="text-xs" style={{color:'#86868b'}}>{idx+1} of {total}</span>}
         </div>
-        <span className="text-xs" style={{color:'#86868b'}}>{'●'.repeat(Math.min(5,q.difficulty||3))}{'○'.repeat(5-Math.min(5,q.difficulty||3))}</span>
+        <span className="text-xs" style={{color:'#86868b'}}>{'‚óè'.repeat(Math.min(5,q.difficulty||3))}{'‚óã'.repeat(5-Math.min(5,q.difficulty||3))}</span>
       </div>
 
       <div className="p-5 space-y-4">
@@ -671,8 +720,8 @@ function QCard({q,onRate,showSR=true,idx,total,isMulti=false,correctSet}){
                 style={{border:`1.5px solid ${border}`,background:bg}}>
                 <span className="font-semibold text-sm mt-0.5 w-5" style={{color:show&&isCor?'#34c759':'#86868b'}}>{letters[i]}</span>
                 <span className="text-sm flex-1" style={{color:txtClr}}>{opt}</span>
-                {show&&isCor&&<span style={{color:'#34c759'}}>✓</span>}
-                {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>✕</span>}
+                {show&&isCor&&<span style={{color:'#34c759'}}>‚úì</span>}
+                {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>‚úï</span>}
               </button>
             );
           })}
@@ -693,10 +742,10 @@ function QCard({q,onRate,showSR=true,idx,total,isMulti=false,correctSet}){
               <div>
                 <p className="text-xs text-center mb-2" style={{color:'#86868b'}}>How confident are you?</p>
                 <div className="grid grid-cols-4 gap-2">
-                  {[['Again','#ff3b30',0],['Hard','#ff9500',1],['Good','#0071e3',2],['Easy','#34c759',3]].map(([l,c,g])=>(
+                  {CONF_CLR.map((c,g)=>(
                     <button key={g} onClick={()=>rate(g)}
-                      className="py-2.5 rounded-xl text-white text-sm font-semibold transition-all active:scale-95"
-                      style={{background:c}}>{l}</button>
+                      className="py-2.5 rounded-xl text-sm font-semibold transition-all active:scale-95"
+                      style={{background:c.bg,color:c.text}}>{c.label}</button>
                   ))}
                 </div>
               </div>
@@ -708,7 +757,7 @@ function QCard({q,onRate,showSR=true,idx,total,isMulti=false,correctSet}){
   );
 }
 
-// ━━━ Back Button ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Back Button ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function BackBtn({onClick,label}){
   return(
     <button onClick={onClick} className="flex items-center gap-1 mb-4 transition-all active:opacity-60" style={{color:'#0071e3'}}>
@@ -717,9 +766,15 @@ function BackBtn({onClick,label}){
   );
 }
 
-// ━━━ REVIEW SESSION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ REVIEW SESSION ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function ReviewSession({questions,dueToday,rateQ,nav}){
-  const[ids]=useState(()=>[...dueToday].sort((a,b)=>a.nextReview-b.nextReview).map(q=>q.id));
+  // Sort: high-yield first, then by overdue time
+  const priOrd={high:0,medium:1,low:2};
+  const[ids]=useState(()=>[...dueToday].sort((a,b)=>{
+    const pa=priOrd[a.priority||'medium']||1,pb=priOrd[b.priority||'medium']||1;
+    if(pa!==pb)return pa-pb;
+    return a.nextReview-b.nextReview;
+  }).map(q=>q.id));
   const[idx,setIdx]=useState(0);
   const[done,setDone]=useState(0);
 
@@ -730,7 +785,7 @@ function ReviewSession({questions,dueToday,rateQ,nav}){
     return(
       <div className="text-center py-16 space-y-3">
         <BackBtn onClick={()=>nav('study')} label="Study"/>
-        <p className="text-5xl">✓</p>
+        <p className="text-5xl">‚úì</p>
         <h2 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>{done?'All caught up':'No cards due'}</h2>
         <p className="text-sm" style={{color:'#86868b'}}>{done?`Reviewed ${done} card${done>1?'s':''}`:''}</p>
       </div>
@@ -751,7 +806,7 @@ function ReviewSession({questions,dueToday,rateQ,nav}){
   );
 }
 
-// ━━━ PRACTICE SESSION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ PRACTICE SESSION ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function PracticeSession({questions,rateQ,nav}){
   const[domain,setDomain]=useState('All');
   const[count,setCount]=useState(10);
@@ -794,7 +849,7 @@ function PracticeSession({questions,rateQ,nav}){
 
   if(idx>=pool.length)return(
     <div className="text-center py-16 space-y-3">
-      <p className="text-5xl">✓</p>
+      <p className="text-5xl">‚úì</p>
       <h2 className="text-2xl font-bold">Practice Complete</h2>
       <p className="text-sm" style={{color:'#86868b'}}>{pool.length} questions reviewed</p>
       <button onClick={()=>setStarted(false)} className="btn-primary">New Session</button>
@@ -809,9 +864,13 @@ function PracticeSession({questions,rateQ,nav}){
   );
 }
 
-// ━━━ FOCUSED SESSION (Topic-by-Topic) ━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ FOCUSED SESSION (Topic-by-Topic) ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function FocusedSession({domain,questions,rateQ,nav}){
-  const domainQs=useMemo(()=>questions.filter(q=>q.domain===domain),[questions,domain]);
+  // Sort: high-yield first, then medium, then low
+  const priOrder={high:0,medium:1,low:2};
+  const domainQs=useMemo(()=>questions.filter(q=>q.domain===domain).sort((a,b)=>
+    (priOrder[a.priority||'medium']||1)-(priOrder[b.priority||'medium']||1)
+  ),[questions,domain]);
   const[viewTab,setViewTab]=useState('unseen');
   const[idx,setIdx]=useState(0);
   const[started,setStarted]=useState(false);
@@ -834,7 +893,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
     if(!card||idx>=pool.length)return(
       <div className="text-center py-16 space-y-3">
         <BackBtn onClick={()=>setStarted(false)} label={domain}/>
-        <p className="text-5xl">✓</p>
+        <p className="text-5xl">‚úì</p>
         <h2 className="text-2xl font-bold" style={{color:'#1d1d1f'}}>Section Complete</h2>
         <p className="text-sm" style={{color:'#86868b'}}>Reviewed {done} question{done>1?'s':''} in {domain}</p>
         <button onClick={()=>setStarted(false)} className="btn-primary">Back to Topic</button>
@@ -882,7 +941,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
             <p className="text-xs" style={{color:'#86868b'}}>Unseen</p>
           </div>
           <div>
-            <p className="text-xl font-bold" style={{color:accuracy>=70?'#34c759':accuracy>=50?'#ff9500':'#ff3b30'}}>{seen.length?accuracy+'%':'—'}</p>
+            <p className="text-xl font-bold" style={{color:accuracy>=70?'#34c759':accuracy>=50?'#ff9500':'#ff3b30'}}>{seen.length?accuracy+'%':'‚Äî'}</p>
             <p className="text-xs" style={{color:'#86868b'}}>Accuracy</p>
           </div>
         </div>
@@ -894,7 +953,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
           <button onClick={()=>startSession(unseen)}
             className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]"
             style={{border:'2px solid '+DOM_CLR[domain]}}>
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:DOM_CLR[domain]+'18'}}>📖</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:DOM_CLR[domain]+'18'}}>üìñ</div>
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Learn New ({unseen.length})</p>
               <p className="text-xs" style={{color:'#86868b'}}>Work through unseen questions sequentially</p>
@@ -906,7 +965,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
         {weak.length>0&&(
           <button onClick={()=>startSession(weak)}
             className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#ff3b3018'}}>🔴</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#ff3b3018'}}>üî¥</div>
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Review Weak ({weak.length})</p>
               <p className="text-xs" style={{color:'#86868b'}}>Questions you last rated Again or Hard</p>
@@ -918,10 +977,10 @@ function FocusedSession({domain,questions,rateQ,nav}){
         {strong.length>0&&(
           <button onClick={()=>startSession(strong)}
             className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
-            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#34c75918'}}>🟢</div>
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#34c75918'}}>üü¢</div>
             <div className="flex-1">
               <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>Reinforce Strong ({strong.length})</p>
-              <p className="text-xs" style={{color:'#86868b'}}>Questions you know — keep them sharp</p>
+              <p className="text-xs" style={{color:'#86868b'}}>Questions you know ‚Äî keep them sharp</p>
             </div>
             <Icon name="arrow" size={14} color="#86868b"/>
           </button>
@@ -929,7 +988,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
 
         <button onClick={()=>startSession(domainQs)}
           className="card w-full p-4 flex items-center gap-4 text-left transition-all active:scale-[0.98]">
-          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#5856d718'}}>📋</div>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-lg" style={{background:'#5856d718'}}>üìã</div>
           <div className="flex-1">
             <p className="text-sm font-semibold" style={{color:'#1d1d1f'}}>All Questions ({domainQs.length})</p>
             <p className="text-xs" style={{color:'#86868b'}}>Full pass through the entire topic</p>
@@ -947,16 +1006,18 @@ function FocusedSession({domain,questions,rateQ,nav}){
           {domainQs.map((q,i)=>{
             const reviewed=q.history&&q.history.length>0;
             const lastGrade=reviewed?q.history[q.history.length-1].g:null;
-            const statusClr=!reviewed?'#d2d2d7':lastGrade>=2?'#34c759':'#ff3b30';
+            const statusClr=!reviewed?'#d2d2d7':lastGrade>=2?'#4dabf7':'#495057';
             const statusTxt=!reviewed?'Unseen':lastGrade>=3?'Easy':lastGrade>=2?'Good':lastGrade>=1?'Hard':'Again';
+            const pri=q.priority||'medium';
             return(
               <div key={q.id} className="flex items-start gap-3 py-3" style={{borderTop:i?'1px solid #f5f5f7':'none'}}>
-                <span className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{background:statusClr}}/>
+                <span className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{background:PRI_CLR[pri]}}/>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm line-clamp-2" style={{color:'#1d1d1f'}}>{q.stem}</p>
                   <div className="flex items-center gap-2 mt-1">
-                    <span className="text-xs" style={{color:statusClr}}>{statusTxt}</span>
-                    {reviewed&&<span className="text-xs" style={{color:'#86868b'}}>· {q.history.length} review{q.history.length>1?'s':''}</span>}
+                    <span className="text-xs font-medium" style={{color:PRI_CLR[pri]}}>{PRI_LABEL[pri]}</span>
+                    <span className="text-xs" style={{color:statusClr}}>¬∑ {statusTxt}</span>
+                    {reviewed&&<span className="text-xs" style={{color:'#86868b'}}>¬∑ {q.history.length} review{q.history.length>1?'s':''}</span>}
                   </div>
                 </div>
               </div>
@@ -968,7 +1029,7 @@ function FocusedSession({domain,questions,rateQ,nav}){
   );
 }
 
-// ━━━ EXAM SESSION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ EXAM SESSION ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function ExamSession({questions,rateQ,nav}){
   const[started,setStarted]=useState(false);
   const[pool,setPool]=useState([]);
@@ -995,9 +1056,9 @@ function ExamSession({questions,rateQ,nav}){
     <div className="space-y-4">
       <BackBtn onClick={()=>nav('study')} label="Study"/>
       <div className="card p-8 text-center space-y-4">
-        <p className="text-5xl">⏱</p>
+        <p className="text-5xl">‚è±</p>
         <h2 className="text-2xl font-bold">EBIR Exam Simulation</h2>
-        <p className="text-sm" style={{color:'#86868b'}}>{Math.min(100,questions.length)} questions · 3 hours</p>
+        <p className="text-sm" style={{color:'#86868b'}}>{Math.min(100,questions.length)} questions ¬∑ 3 hours</p>
         <button onClick={start} className="btn-primary">Begin Exam</button>
       </div>
     </div>
@@ -1069,7 +1130,7 @@ function ExamSession({questions,rateQ,nav}){
   );
 }
 
-// ━━━ FLASHCARD SESSION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ FLASHCARD SESSION ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function FlashSession({flashcards,setFlashcards,nav}){
   const[studying,setStudying]=useState(false);
   const[idx,setIdx]=useState(0);
@@ -1092,10 +1153,10 @@ function FlashSession({flashcards,setFlashcards,nav}){
             <p className="text-lg" style={{color:'#1d1d1f'}}>{flipped?c.back:c.front}</p>
           </div>
         </div>
-        <p className="text-xs text-center" style={{color:'#86868b'}}>Tap to flip · {idx%flashcards.length+1}/{flashcards.length}</p>
+        <p className="text-xs text-center" style={{color:'#86868b'}}>Tap to flip ¬∑ {idx%flashcards.length+1}/{flashcards.length}</p>
         <div className="flex gap-3 justify-center">
-          <button onClick={()=>{setIdx(i=>i-1<0?flashcards.length-1:i-1);setFlipped(false)}} className="btn-secondary">← Prev</button>
-          <button onClick={()=>{setIdx(i=>i+1);setFlipped(false)}} className="btn-primary">Next →</button>
+          <button onClick={()=>{setIdx(i=>i-1<0?flashcards.length-1:i-1);setFlipped(false)}} className="btn-secondary">‚Üê Prev</button>
+          <button onClick={()=>{setIdx(i=>i+1);setFlipped(false)}} className="btn-primary">Next ‚Üí</button>
         </div>
       </div>
     );
@@ -1129,7 +1190,7 @@ function FlashSession({flashcards,setFlashcards,nav}){
             <p className="font-medium text-sm" style={{color:'#1d1d1f'}}>{c.front}</p>
             <p className="text-xs mt-0.5 truncate" style={{color:'#86868b'}}>{c.back}</p>
           </div>
-          <button onClick={()=>del(c.id)} style={{color:'#86868b'}} className="text-sm">✕</button>
+          <button onClick={()=>del(c.id)} style={{color:'#86868b'}} className="text-sm">‚úï</button>
         </div>
       ))}
       {flashcards.length===0&&<p className="text-sm text-center py-8" style={{color:'#86868b'}}>No flashcards yet. Tap + Add to create one.</p>}
@@ -1137,7 +1198,7 @@ function FlashSession({flashcards,setFlashcards,nav}){
   );
 }
 
-// ━━━ VIVA SESSION ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ VIVA SESSION ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function VivaSession({vivaLog,setVivaLog,nav,tickStreak}){
   const[cur,setCur]=useState(null);
   const[ans,setAns]=useState('');
@@ -1151,7 +1212,7 @@ function VivaSession({vivaLog,setVivaLog,nav,tickStreak}){
     <div className="space-y-4">
       <BackBtn onClick={()=>nav('study')} label="Study"/>
       <div className="card p-8 text-center space-y-4">
-        <p className="text-5xl">💬</p>
+        <p className="text-5xl">üí¨</p>
         <h2 className="text-2xl font-bold">Viva Simulator</h2>
         <p className="text-sm" style={{color:'#86868b'}}>Practise answering oral exam questions. Write your response, then compare to a model answer.</p>
         <button onClick={start} className="btn-primary">Start Viva</button>
@@ -1200,7 +1261,7 @@ function VivaSession({vivaLog,setVivaLog,nav,tickStreak}){
   );
 }
 
-// ━━━ CASES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ CASES ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function Cases({cases,setCases,tickStreak,nav}){
   const[active,setActive]=useState(null);
   const[step,setStep]=useState(0);
@@ -1321,8 +1382,8 @@ function Cases({cases,setCases,tickStreak,nav}){
                   style={{border:`1.5px solid ${border}`,background:bg}}>
                   <span className="font-semibold text-sm mt-0.5 w-5" style={{color:show&&isCor?'#34c759':'#86868b'}}>{letters[i]}</span>
                   <span className="text-sm flex-1" style={{color:txtClr}}>{opt}</span>
-                  {show&&isCor&&<span style={{color:'#34c759'}}>✓</span>}
-                  {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>✕</span>}
+                  {show&&isCor&&<span style={{color:'#34c759'}}>‚úì</span>}
+                  {show&&isSel&&!isCor&&<span style={{color:'#ff3b30'}}>‚úï</span>}
                 </button>
               );
             })}
@@ -1337,7 +1398,7 @@ function Cases({cases,setCases,tickStreak,nav}){
                 <p className="text-sm leading-relaxed" style={{color:'#3a3a3c'}}>{q.explanation}</p>
               </div>
               <button onClick={next} className="btn-primary w-full">
-                {step<active.questions.length-1?'Next Step →':'Finish Case'}
+                {step<active.questions.length-1?'Next Step ‚Üí':'Finish Case'}
               </button>
             </div>
           )}
@@ -1347,7 +1408,7 @@ function Cases({cases,setCases,tickStreak,nav}){
   );
 }
 
-// ━━━ LIBRARY ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ LIBRARY ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function Library({questions,setQuestions,cases,setCases,flashcards,setFlashcards,addQuestions,nav,subPage}){
   if(subPage==='import')return<ImportPage questions={questions} setQuestions={setQuestions} cases={cases} setCases={setCases} flashcards={flashcards} setFlashcards={setFlashcards} addQuestions={addQuestions} nav={nav}/>;
   if(subPage==='add')return<AddQuestion addQuestions={addQuestions} nav={nav}/>;
@@ -1398,9 +1459,10 @@ function Library({questions,setQuestions,cases,setCases,flashcards,setFlashcards
           <p className="text-xs" style={{color:'#86868b'}}>{filtered.length} question{filtered.length!==1?'s':''}</p>
           {filtered.map(q=>(
             <div key={q.id} className="card p-4">
-              <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{background:DOM_CLR[q.domain]}}>{q.domain}</span>
-                <span className="text-xs" style={{color:'#86868b'}}>{'●'.repeat(q.difficulty)}{'○'.repeat(5-q.difficulty)}</span>
+                <span className="text-xs font-medium px-1.5 py-0.5 rounded" style={{background:PRI_BG[q.priority||'medium'],color:PRI_CLR[q.priority||'medium']}}>{PRI_LABEL[q.priority||'medium']}</span>
+                <span className="text-xs" style={{color:'#86868b'}}>{'‚óè'.repeat(q.difficulty)}{'‚óã'.repeat(5-q.difficulty)}</span>
                 {q.history?.length>0&&<span className="text-xs ml-auto" style={{color:'#86868b'}}>{q.history.length} reviews</span>}
               </div>
               <p className="text-sm line-clamp-2" style={{color:'#1d1d1f'}}>{q.stem}</p>
@@ -1429,7 +1491,7 @@ function Library({questions,setQuestions,cases,setCases,flashcards,setFlashcards
   );
 }
 
-// ━━━ ADD QUESTION FORM ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ ADD QUESTION FORM ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function AddQuestion({addQuestions,nav}){
   const[q,setQ]=useState({stem:'',options:['','','',''],correct:0,explanation:'',domain:'Basic Sciences',difficulty:3,source:''});
   const update=(k,v)=>setQ(p=>({...p,[k]:v}));
@@ -1475,7 +1537,7 @@ function AddQuestion({addQuestions,nav}){
   );
 }
 
-// ━━━ IMPORT / EXPORT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ IMPORT / EXPORT ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function ImportPage({questions,setQuestions,cases,setCases,flashcards,setFlashcards,addQuestions,nav}){
   const[text,setText]=useState('');
   const[msg,setMsg]=useState('');
@@ -1494,10 +1556,11 @@ function ImportPage({questions,setQuestions,cases,setCases,flashcards,setFlashca
         if(data.flashcards)setFlashcards(data.flashcards);
         setText('');flash('Full backup restored');return;
       }
-      // Check if it's case format (has "questions" array with "stem" inside)
+      // Check if it's case format (has "title" + nested "questions" array with objects that have "stem")
       const arr=Array.isArray(data)?data:[data];
-      if(arr[0]&&arr[0].history&&Array.isArray(arr[0].questions)){
-        setCases(p=>[...p,...arr.map(c=>({...c,log:[]}))]);
+      const looksLikeCase=arr[0]&&arr[0].title&&Array.isArray(arr[0].questions)&&arr[0].questions.length>0&&arr[0].questions[0].stem;
+      if(looksLikeCase){
+        setCases(p=>[...p,...arr.map(c=>({...c,log:c.log||[]}))]);
         setText('');flash(`Imported ${arr.length} case${arr.length>1?'s':''}`);return;
       }
       // Otherwise treat as questions
@@ -1512,14 +1575,14 @@ function ImportPage({questions,setQuestions,cases,setCases,flashcards,setFlashca
     if(file.name.endsWith('.json')){
       const t=await file.text();
       setText(t);
-      flash('JSON loaded — review and click Import');
+      flash('JSON loaded ‚Äî review and click Import');
     }else if(file.name.endsWith('.pdf')){
       setPdfStatus('Extracting text from PDF...');
       try{
         const txt=await extractPdfText(file);
         setText(txt);
         setPdfStatus('');
-        flash('PDF text extracted — edit or paste as JSON to import');
+        flash('PDF text extracted ‚Äî edit or paste as JSON to import');
       }catch(err){
         setPdfStatus('');
         flash('PDF extraction failed: '+err.message);
@@ -1573,14 +1636,14 @@ function ImportPage({questions,setQuestions,cases,setCases,flashcards,setFlashca
       {/* Export */}
       <div className="card p-5 space-y-3">
         <p className="text-xs font-semibold uppercase tracking-wider" style={{color:'#86868b'}}>Export Data</p>
-        <p className="text-sm" style={{color:'#86868b'}}>{questions.length} questions · {cases.length} cases · {flashcards.length} flashcards</p>
+        <p className="text-sm" style={{color:'#86868b'}}>{questions.length} questions ¬∑ {cases.length} cases ¬∑ {flashcards.length} flashcards</p>
         <button onClick={exportAll} className="btn-primary w-full">Download JSON Backup</button>
       </div>
     </div>
   );
 }
 
-// ━━━ SETTINGS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ SETTINGS ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 function Settings({questions,cases,flashcards}){
   const totalRev=questions.reduce((s,q)=>s+(q.history?.length||0),0);
   const mastered=questions.filter(q=>q.repetitions>=3).length;
@@ -1603,9 +1666,9 @@ function Settings({questions,cases,flashcards}){
       <div className="card p-5 space-y-3">
         <p className="text-xs font-semibold uppercase tracking-wider" style={{color:'#86868b'}}>Install on iPhone</p>
         <div className="flex items-start gap-3">
-          <span className="text-2xl">📱</span>
+          <span className="text-2xl">üì±</span>
           <div>
-            <p className="text-sm" style={{color:'#1d1d1f'}}>Open this page in Safari, then tap the <strong>Share</strong> button → <strong>Add to Home Screen</strong>.</p>
+            <p className="text-sm" style={{color:'#1d1d1f'}}>Open this page in Safari, then tap the <strong>Share</strong> button ‚Üí <strong>Add to Home Screen</strong>.</p>
             <p className="text-xs mt-1" style={{color:'#86868b'}}>The app will work offline and appear as a native icon on your home screen.</p>
           </div>
         </div>
@@ -1620,12 +1683,12 @@ function Settings({questions,cases,flashcards}){
         </button>
       </div>
 
-      <p className="text-xs text-center py-4" style={{color:'#c7c7cc'}}>EBIR Distinction Engine · v2.0</p>
+      <p className="text-xs text-center py-4" style={{color:'#c7c7cc'}}>EBIR Distinction Engine ¬∑ v2.0</p>
     </div>
   );
 }
 
-// ━━━ Render ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// ‚îÅ‚îÅ‚îÅ Render ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ‚îÅ
 ReactDOM.createRoot(document.getElementById('root')).render(<ErrBound><App/></ErrBound>);
 </script>
 </body>
